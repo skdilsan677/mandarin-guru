@@ -245,6 +245,7 @@
         <button class="btn border-pink-300" data-role="cnThenHi">CN→HI</button>
         <button class="btn border-gray-300" data-role="markMaster">✅ Mark Mastered</button>
         <button class="btn border-red-300" data-role="speakPractice">🎤 Practice Speaking</button>
+        <button class="btn border-pink-500" data-role="infinitePlay">♾️ Infinite CN→HI</button>
       </div>
       <div data-role="speechStatus" class="mt-3 text-sm font-medium"></div>
     </div>
@@ -459,6 +460,7 @@
     let isStopped = false;
     let isRepeating = false;
     let playbackQueue = [];
+    let infiniteLoopIndex = -1; // Added for infinite loop feature
 
     function matchFilters(d, idx) {
       const q = $("#searchInput").value.trim().toLowerCase();
@@ -513,6 +515,15 @@
         node.querySelector('[data-role="markMaster"]').onclick = () => { toggleMaster(i, true); render(); };
 
         node.querySelector('[data-role="speakPractice"]').onclick = () => speakPractice(i, node);
+        
+        // नया फीचर: अनंत लूप बटन
+        node.querySelector('[data-role="infinitePlay"]').onclick = () => {
+          if (infiniteLoopIndex === i) {
+            stopInfiniteLoop();
+          } else {
+            startInfiniteLoop(i);
+          }
+        };
 
         favBtn.onclick = () => { toggleFav(i); render(); };
 
@@ -533,6 +544,39 @@
 
       highlightActiveCard(playbackQueue[0]);
       updateProgress();
+    }
+    
+    // नया फीचर: अनंत लूप फ़ंक्शन
+    let loopTimeoutId = null;
+    async function startInfiniteLoop(index) {
+      stopInfiniteLoop();
+      infiniteLoopIndex = index;
+      requestWakeLock();
+      const loop = async () => {
+        if (infiniteLoopIndex !== index) return;
+        const dialogue = dialogues[index];
+        highlightActiveCard(index);
+
+        await new Promise(resolve => {
+          const u = speak(dialogue.zh, { lang: "zh-CN", voiceURI: S.cnVoice, rate: S.rate, onendCallback: resolve });
+        });
+
+        await new Promise(resolve => {
+          const u = speak(dialogue.hi, { lang: "hi-IN", voiceURI: S.hiVoice, rate: S.rate, onendCallback: resolve });
+        });
+        
+        loopTimeoutId = setTimeout(loop, 500); // 0.5 सेकंड का गैप
+      };
+      loop();
+    }
+
+    function stopInfiniteLoop() {
+      if (loopTimeoutId) clearTimeout(loopTimeoutId);
+      synth.cancel();
+      infiniteLoopIndex = -1;
+      releaseWakeLock();
+      $$(`[data-role="infinitePlay"]`).forEach(btn => btn.textContent = '♾️ Infinite CN→HI');
+      $$(`.active-dialogue`).forEach(el => el.classList.remove('active-dialogue'));
     }
 
     function highlightActiveCard(index) {
