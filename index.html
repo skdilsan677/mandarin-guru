@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mandarin Guru – C-Drama Learner (Hindi First, Pro)</title>
+  <meta name="theme-color" content="#10b981" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--card:255,255,255;--text:17,24,39;--muted:107,114,128;--ring:16,185,129}
+    .dark :root{--card:17,24,39;--text:243,244,246;--muted:156,163,175}
+    body{font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"}
+    .btn{ @apply inline-flex items-center gap-2 px-3 py-2 rounded-2xl border shadow-sm text-sm transition active:scale-[.98]; }
+    .btn:hover{ @apply scale-[1.02]; }
+    .chip{ @apply px-2 py-1 rounded-full text-xs border; }
+    .card{ background: rgba(var(--card),1); color: rgba(var(--text),1); }
+    .muted{ color: rgba(var(--muted),1); }
+    .ring-brand{ box-shadow: 0 0 0 3px rgba(var(--ring),.25); }
+    .active-dialogue{ @apply ring-brand; }
+    .kbd{ @apply px-1.5 py-0.5 rounded border text-xs bg-gray-100 dark:bg-gray-800; }
+    .pill{ @apply px-2 py-0.5 rounded-full text-xs font-medium; }
+    .pinyin-highlight { @apply text-green-500 font-semibold; }
+    .pinyin-mismatch { @apply text-red-500 font-semibold; }
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+  <header class="sticky top-0 z-30 backdrop-blur bg-white/70 dark:bg-gray-900/70 border-b">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div class="text-2xl">🀄</div>
+      <div class="flex-1">
+        <h1 class="text-lg sm:text-xl font-bold">Mandarin Guru — C-Drama (Hindi-First)</h1>
+        <p class="text-xs sm:text-sm muted">Hindi से Mandarin सीखें • TTS • Quiz • Flashcards • Recording • Local save</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="themeBtn" class="btn border-gray-300 dark:border-gray-700">🌙/☀️</button>
+        <button id="exportBtn" class="btn border-gray-300 dark:border-gray-700">💾 Export</button>
+        <label class="btn border-gray-300 dark:border-gray-700 cursor-pointer">
+          📥 Import <input id="importInput" type="file" accept="application/json" class="hidden">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 py-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="card p-3 rounded-2xl border">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="playAllBtn" class="btn bg-green-100 dark:bg-emerald-900/40 border-emerald-300 dark:border-emerald-700">▶️ Play All (CN→HI)</button>
+          <button id="repeatAllBtn" class="btn bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700">🔁 Repeat All (CN→HI)</button>
+          <button id="pauseBtn" class="btn bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700">⏸️ Pause</button>
+          <button id="resumeBtn" class="btn bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700">⏯️ Resume</button>
+          <button id="stopBtn" class="btn bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700">⏹️ Stop</button>
+          <button id="prevBtn" class="btn border-gray-300 dark:border-gray-700">⏮️ Previous</button>
+          <button id="nextBtn" class="btn border-gray-300 dark:border-gray-700">⏭️ Next</button>
+        </div>
+        <p class="text-xs mt-2 muted">Solo-while-PlayAll: किसी भी लाइन पर <span class="kbd">🎵 Solo</span> दबाएँ — Play All स्वतः Resume होगा।</p>
+      </div>
+
+      <div class="card p-3 rounded-2xl border">
+        <div class="flex flex-wrap items-center gap-2">
+          <input id="searchInput" class="px-3 py-2 rounded-2xl border w-full sm:w-48 dark:bg-gray-800" placeholder="🔍 Mandarin/Hindi/Drama" />
+          <select id="dramaFilter" class="px-3 py-2 rounded-2xl border dark:bg-gray-800">
+            <option value="">🎭 All Dramas</option>
+          </select>
+          <label class="chip border-gray-300 dark:border-gray-700">
+            <input id="hideHindi" type="checkbox" class="mr-1"> Hindi छिपाएँ
+          </label>
+          <label class="chip border-gray-300 dark:border-gray-700">
+            <input id="showOnlyFav" type="checkbox" class="mr-1"> ⭐ केवल Favorites
+          </label>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 mt-2">
+          <label class="chip border-gray-300 dark:border-gray-700">⚡ Rate
+            <select id="rateSelect" class="ml-2 px-2 py-1 rounded-xl border dark:bg-gray-800">
+              <option value="0.8">Slow</option>
+              <option value="1" selected>Normal</option>
+              <option value="1.2">Fast</option>
+              <option value="1.4">Faster</option>
+            </select>
+          </label>
+          <label class="chip border-gray-300 dark:border-gray-700">🇨🇳 Voice
+            <select id="cnVoice" class="ml-2 px-2 py-1 rounded-xl border dark:bg-gray-800"></select>
+          </label>
+          <label class="chip border-gray-300 dark:border-gray-700">🇮🇳 Voice
+            <select id="hiVoice" class="ml-2 px-2 py-1 rounded-xl border dark:bg-gray-800"></select>
+          </label>
+          <label class="chip border-gray-300 dark:border-gray-700">
+            <input type="checkbox" id="autoRepeat" class="mr-1"> 🔁 Auto-repeat (TAP line)
+          </label>
+        </div>
+      </div>
+
+      <div class="card p-3 rounded-2xl border">
+        <div class="flex items-center justify-between">
+          <div>
+            <div id="progressText" class="text-sm font-semibold">Progress: 0 / 0 mastered</div>
+            <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 mt-1">
+              <div id="progressBar" class="bg-emerald-500 h-2 rounded-full" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs muted">Shortcuts</div>
+            <div class="flex gap-1 flex-wrap mt-1">
+              <span class="kbd">Space</span>
+              <span class="kbd">N</span>
+              <span class="kbd">S</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-5xl mx-auto px-4">
+    <div class="flex gap-2 mb-3">
+      <button data-tab="learn" class="tab btn border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">📚 Learn</button>
+      <button data-tab="vocab" class="tab btn border-gray-300 dark:border-gray-700">🔤 Vocabulary</button>
+      <button data-tab="quiz" class="tab btn border-gray-300 dark:border-gray-700">📝 Quiz</button>
+      <button data-tab="flash" class="tab btn border-gray-300 dark:border-gray-700">🎴 Flashcards</button>
+      <button data-tab="add-dialogue" class="tab btn border-gray-300 dark:border-gray-700">➕ Add Dialogue</button>
+      <button data-tab="settings" class="tab btn border-gray-300 dark:border-gray-700">⚙️ Settings</button>
+    </div>
+  </section>
+
+  <section id="tab-learn" class="max-w-5xl mx-auto px-4 space-y-3">
+    <div id="dialogueContainer" class="space-y-3"></div>
+  </section>
+  
+  <section id="tab-vocab" class="max-w-5xl mx-auto px-4 hidden">
+    <div class="card p-4 rounded-2xl border">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-lg font-semibold">🔤 Vocabulary List</div>
+      </div>
+      <input id="vocabSearch" class="px-3 py-2 rounded-2xl border w-full dark:bg-gray-800" placeholder="🔍 Search Pinyin/Hindi" />
+      <div id="vocabContainer" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"></div>
+    </div>
+  </section>
+
+  <section id="tab-quiz" class="max-w-5xl mx-auto px-4 hidden">
+    <div class="card p-4 rounded-2xl border">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-lg font-semibold">📝 Multiple Choice (Mandarin → हिंदी)</div>
+        <button id="newQuizBtn" class="btn border-gray-300 dark:border-gray-700">🔄 New</button>
+      </div>
+      <div id="quizBox" class="space-y-3"></div>
+    </div>
+  </section>
+
+  <section id="tab-flash" class="max-w-5xl mx-auto px-4 hidden">
+    <div class="card p-4 rounded-2xl border">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-lg font-semibold">🎴 Spaced Practice</div>
+        <div class="flex gap-2">
+          <button id="reviewFavs" class="btn border-gray-300 dark:border-gray-700">⭐ Review Favorites</button>
+          <button id="reviewAll" class="btn border-gray-300 dark:border-gray-700">📚 Review All</button>
+        </div>
+      </div>
+      <div id="flashBox" class="space-y-3"></div>
+    </div>
+  </section>
+
+  <section id="tab-add-dialogue" class="max-w-5xl mx-auto px-4 hidden">
+    <div class="card p-4 rounded-2xl border">
+      <div class="text-lg font-semibold mb-2">➕ Add New Dialogue</div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium muted mb-1">Mandarin (Chinese)</label>
+          <textarea id="inputZh" class="w-full h-24 px-3 py-2 rounded-2xl border dark:bg-gray-800" placeholder="यहाँ चीनी में डायलॉग लिखें"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button id="zhPasteBtn" class="btn border-blue-300 dark:border-blue-700">📋 Paste & Auto-Pinyin</button>
+            <button id="zhClearBtn" class="btn border-gray-300 dark:border-gray-700">🧹 Clear</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium muted mb-1">Pinyin</label>
+          <input type="text" id="inputPinyin" class="w-full px-3 py-2 rounded-2xl border dark:bg-gray-800" placeholder="यहाँ पिनयिन लिखें (वैकल्पिक)">
+        </div>
+        <div>
+          <label class="block text-sm font-medium muted mb-1">Hindi</label>
+          <textarea id="inputHi" class="w-full h-24 px-3 py-2 rounded-2xl border dark:bg-gray-800" placeholder="यहाँ हिंदी में अनुवाद लिखें"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button id="hiPasteBtn" class="btn border-blue-300 dark:border-blue-700">📋 Paste & Clean</button>
+            <button id="hiClearBtn" class="btn border-gray-300 dark:border-gray-700">🧹 Clear</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium muted mb-1">Drama/Category</label>
+          <input type="text" id="inputDrama" class="w-full px-3 py-2 rounded-2xl border dark:bg-gray-800" placeholder="जैसे: Love Between, HSK 1, etc.">
+        </div>
+        <button id="saveDialogueBtn" class="btn border-emerald-300 bg-emerald-100 dark:bg-emerald-900/30">💾 Save New Dialogue</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-settings" class="max-w-5xl mx-auto px-4 hidden">
+    <div class="grid md:grid-cols-2 gap-3">
+      <div class="card p-4 rounded-2xl border">
+        <div class="text-lg font-semibold mb-2">🔡 Pinyin Helper (Manual)</div>
+        <p class="text-sm muted mb-2">किसी भी लाइन में अपना Pinyin जोड़ें/सेव करें — बाद में hover/tap पर दिखेगा।</p>
+        <textarea id="pinyinEditor" class="w-full h-24 px-3 py-2 rounded-2xl border dark:bg-gray-800" placeholder="यहाँ पिनयिन लिखें..."></textarea>
+        <div class="flex gap-2 mt-2">
+          <button id="savePinyin" class="btn border-gray-300 dark:border-gray-700">💾 Save for Selected Line</button>
+          <button id="clearPinyin" class="btn border-gray-300 dark:border-gray-700">🧹 Clear</button>
+        </div>
+        <p id="pinyinHint" class="text-xs muted mt-2">Learn टैब में किसी लाइन के ⋯ मेनू से “Edit Pinyin” दबाएँ।</p>
+      </div>
+      <div class="card p-4 rounded-2xl border">
+        <div class="text-lg font-semibold mb-2">📦 Backup & Restore</div>
+        <p class="text-sm muted">आपकी प्रोग्रेस, फेवरेट्स, कस्टम पिनयिन, सेटिंग्स — सब लोकल में सेव होते हैं। Export/Import से बैकअप रखें।</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="max-w-5xl mx-auto px-4 py-8 text-center muted text-xs">
+    Built for Hindi→Mandarin learners • Works offline • No trackers
+  </footer>
+
+  <template id="dialogueTemplate">
+    <div class="card p-3 rounded-2xl border">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="pill bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200" data-role="drama"></span>
+            <span class="pill bg-gray-100 dark:bg-gray-800 muted">#<span data-role="index"></span></span>
+            <button data-role="favBtn" class="chip border-yellow-400">⭐ Favorite</button>
+            <span class="chip border-emerald-300" data-role="masterTag" hidden>✅ Mastered</span>
+          </div>
+          <div class="mt-2 text-lg leading-relaxed break-words">
+            <span class="align-middle" data-role="zh"></span>
+            <span class="text-xs ml-2 px-2 py-0.5 rounded-full border muted" data-role="pinyinBadge" hidden>拼音</span>
+          </div>
+          <div class="mt-1 text-sm muted" data-role="pinyin" hidden></div>
+          <div class="mt-1 text-base leading-relaxed" data-role="hi"></div>
+        </div>
+        <div>
+          <button class="btn border-gray-300 dark:border-gray-700" data-role="menuBtn">⋯</button>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button class="btn border-emerald-300" data-role="playCN">🇨🇳 Play CN</button>
+        <button class="btn border-orange-300" data-role="playHI">🇮🇳 Play HI</button>
+        <button class="btn border-blue-300" data-role="solo">🎵 Solo</button>
+        <button class="btn border-purple-300" data-role="record">🎙️ Record</button>
+        <button class="btn border-indigo-300" data-role="replayRec">🎧 Replay</button>
+        <button class="btn border-pink-300" data-role="cnThenHi">CN→HI</button>
+        <button class="btn border-gray-300" data-role="markMaster">✅ Mark Mastered</button>
+        <button class="btn border-red-300" data-role="speakPractice">🎤 Practice Speaking</button>
+      </div>
+      <div data-role="speechStatus" class="mt-3 text-sm font-medium"></div>
+    </div>
+  </template>
+  
+  <template id="vocabCardTemplate">
+    <div class="card p-3 rounded-2xl border text-center">
+      <div class="flex justify-end gap-1">
+          <button data-role="bookmarkBtn" class="text-gray-400 hover:text-yellow-500 transition">🔖</button>
+      </div>
+      <div class="text-xl font-bold" data-role="zh"></div>
+      <div class="text-sm muted mt-1" data-role="pinyin"></div>
+      <div class="text-xs muted mt-2" data-role="hi"></div>
+      <div class="pill bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 mt-2" data-role="hsk" hidden></div>
+    </div>
+  </template>
+
+  <template id="menuTemplate">
+    <div class="absolute z-40 mt-2 w-56 card border rounded-2xl p-2 shadow-lg">
+      <button data-action="editPinyin" class="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">✏️ Edit Pinyin</button>
+      <button data-action="copyCN" class="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">📋 Copy Mandarin</button>
+      <button data-action="copyHI" class="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">📋 Copy Hindi</button>
+      <button data-action="speakSlow" class="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">🐢 Speak Slow (0.8x)</button>
+      <button data-action="removeMaster" class="w-full text-left px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">❎ Unmark Mastered</button>
+    </div>
+  </template>
+
+  <script src="https://unpkg.com/pinyin@3.0.0-pinyin-only/lib/pinyin-bundle.js"></script>
+  <script>
+    // ------------ DATA FROM data.json (Reduced to 10 dialogues) ------------
+    const jsonData = {
+      "dialogues": [
+        { "drama": "Love Between Fairy and Devil", "zh": "我，东方青苍，永远不会爱上任何一个女人。", "hi": "मैं, डोंगफ़ांग छिंगकांग, कभी किसी औरत से प्यार नहीं करूँगा।" },
+                { "drama": "Love Between Fairy and Devil", "zh": "我不是为了天下苍生，我只是为了你一个人。", "hi": "मैं दुनिया के लिए नहीं, सिर्फ तुम्हारे लिए हूँ।" }
+      ],
+      "vocabData": [
+        { "zh": "你", "pinyin": "nǐ", "hi": "तुम, आप", "hsk": "HSK 1" },
+        { "zh": "我", "pinyin": "wǒ", "hi": "मैं", "hsk": "HSK 1" },
+        { "zh": "他", "pinyin": "tā", "hi": "वह (पुरुष)", "hsk": "HSK 1" },
+        { "zh": "有", "pinyin": "yǒu", "hi": "पास है", "hsk": "HSK 1" },
+        { "zh": "不", "pinyin": "bù", "hi": "नहीं", "hsk": "HSK 1" },
+        { "zh": "爱", "pinyin": "ài", "hi": "प्यार", "hsk": "HSK 1" },
+        { "zh": "人", "pinyin": "rén", "hi": "इंसान, आदमी", "hsk": "HSK 1" },
+        { "zh": "回", "pinyin": "huí", "hi": "वापस", "hsk": "HSK 1" },
+        { "zh": "在", "pinyin": "zài", "hi": "में, पर", "hsk": "HSK 1" },
+        { "zh": "是", "pinyin": "shì", "hi": "है (to be)", "hsk": "HSK 1" },
+        { "zh": "吗", "pinyin": "ma", "hi": "क्या (प्रश्न)", "hsk": "HSK 1" },
+        { "zh": "家", "pinyin": "jiā", "hi": "घर", "hsk": "HSK 1" },
+        { "zh": "酒", "pinyin": "jiǔ", "hi": "शराब", "hsk": "HSK 1" },
+        { "zh": "好", "pinyin": "hǎo", "hi": "अच्छा", "hsk": "HSK 1" },
+        { "zh": "喜欢", "pinyin": "xǐhuān", "hi": "पसंद करना", "hsk": "HSK 2" },
+        { "zh": "朋友", "pinyin": "péngyou", "hi": "दोस्त", "hsk": "HSK 2" },
+        { "zh": "和", "pinyin": "hé", "hi": "और", "hsk": "HSK 1" },
+        { "zh": "看", "pinyin": "kàn", "hi": "देखना", "hsk": "HSK 1" },
+        { "zh": "说", "pinyin": "shuō", "hi": "बोलना", "hsk": "HSK 1" },
+        { "zh": "想", "pinyin": "xiǎng", "hi": "सोचना, चाहना", "hsk": "HSK 1" },
+        { "zh": "知道", "pinyin": "zhīdào", "hi": "जानना", "hsk": "HSK 1" },
+        { "zh": "这里", "pinyin": "zhèlǐ", "hi": "यहाँ", "hsk": "HSK 2" },
+        { "zh": "那里", "pinyin": "nàlǐ", "hi": "वहाँ", "hsk": "HSK 2" },
+        { "zh": "为什么", "pinyin": "wèishénme", "hi": "क्यों", "hsk": "HSK 2" },
+        { "zh": "爱上", "pinyin": "àishàng", "hi": "प्यार हो जाना", "hsk": "HSK 2" },
+        { "zh": "离开", "pinyin": "líkāi", "hi": "छोड़ना", "hsk": "HSK 2" },
+        { "zh": "名字", "pinyin": "míngzi", "hi": "नाम", "hsk": "HSK 1" },
+        { "zh": "谢谢", "pinyin": "xièxie", "hi": "धन्यवाद", "hsk": "HSK 1" },
+        { "zh": "对不起", "pinyin": "duìbuqǐ", "hi": "माफ़ करना", "hsk": "HSK 1" },
+        { "zh": "没事", "pinyin": "méishì", "hi": "कोई बात नहीं", "hsk": "HSK 2" },
+        { "zh": "再见", "pinyin": "zàijiàn", "hi": "अलविदा", "hsk": "HSK 1" }
+      ]
+    };
+
+    // ------------ GLOBAL STATE / STORAGE ------------
+    let dialogues = [];
+    let vocabData = [];
+
+    const S = {
+      rate: 1, cnVoice: "", hiVoice: "", favorites: new Set(),
+      mastered: new Set(), pinyin: {}, // key: index -> string
+      dark: false, bookmarkedVocab: new Set()
+    };
+    const LSKEY = "mandarin_guru_state_v2"; // Changed key to avoid conflicts with old data
+    const $ = (q, el = document) => el.querySelector(q);
+    const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(LSKEY);
+        if (!raw) return;
+        const o = JSON.parse(raw);
+        S.rate = o.rate ?? 1;
+        S.cnVoice = o.cnVoice ?? "";
+        S.hiVoice = o.hiVoice ?? "";
+        S.favorites = new Set(o.favorites ?? []);
+        S.mastered = new Set(o.mastered ?? []);
+        S.pinyin = o.pinyin ?? {};
+        S.dark = !!o.dark;
+        S.bookmarkedVocab = new Set(o.bookmarkedVocab ?? []);
+        if (S.dark) document.documentElement.classList.add("dark");
+      } catch (e) { }
+    }
+
+    function saveState() {
+      const out = {
+        rate: S.rate, cnVoice: S.cnVoice, hiVoice: S.hiVoice,
+        favorites: [...S.favorites], mastered: [...S.mastered],
+        pinyin: S.pinyin, dark: S.dark, bookmarkedVocab: [...S.bookmarkedVocab]
+      };
+      localStorage.setItem(LSKEY, JSON.stringify(out));
+      updateProgress();
+    }
+
+    // ------------ DATA FETCHING (MODIFIED) ------------
+    async function fetchData() {
+      // Use the embedded jsonData directly
+      dialogues = jsonData.dialogues;
+      vocabData = jsonData.vocabData;
+
+      // Load any user-added dialogues from local storage
+      const userDialogues = JSON.parse(localStorage.getItem('userDialogues') || '[]');
+      dialogues = dialogues.concat(userDialogues);
+
+      render();
+      renderVocabulary();
+      populateDramaFilter();
+    }
+
+    // ------------ VOICES / TTS ------------
+    let synth = window.speechSynthesis;
+    let voices = [];
+    function refreshVoices() {
+      voices = synth.getVoices();
+      const cnSel = $("#cnVoice"), hiSel = $("#hiVoice");
+      cnSel.innerHTML = ""; hiSel.innerHTML = "";
+      const mkopt = (v) => {
+        const o = document.createElement("option");
+        o.value = v.voiceURI; o.textContent = `${v.name} (${v.lang})`;
+        return o;
+      };
+      voices.filter(v => /zh|cmn|Chinese/i.test(v.lang)).forEach(v => cnSel.appendChild(mkopt(v)));
+      voices.filter(v => /hi|Hindi/i.test(v.lang)).forEach(v => hiSel.appendChild(mkopt(v)));
+      if (!cnSel.children.length) voices.forEach(v => cnSel.appendChild(mkopt(v)));
+      if (!hiSel.children.length) voices.forEach(v => hiSel.appendChild(mkopt(v)));
+      if (S.cnVoice) cnSel.value = S.cnVoice;
+      if (S.hiVoice) hiSel.value = S.hiVoice;
+    }
+
+    function speak(text, { lang, voiceURI, rate, onendCallback }) {
+      synth.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = lang || "zh-CN";
+      u.rate = rate ?? S.rate;
+      if (voiceURI) {
+        const v = voices.find(x => x.voiceURI === voiceURI);
+        if (v) u.voice = v;
+      }
+      u.onend = () => {
+        if (onendCallback) onendCallback();
+      };
+      synth.speak(u);
+      return u;
+    }
+
+    // ------------ WAKE LOCK API (New Feature) ------------
+    let wakeLock = null;
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+          console.log('Wake Lock सक्रिय');
+        } catch (err) {
+          console.log(`Wake Lock सक्रिय नहीं हुआ: ${err.name}, ${err.message}`);
+        }
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock !== null) {
+        wakeLock.release();
+        wakeLock = null;
+        console.log('Wake Lock जारी हुआ');
+      }
+    }
+
+    document.addEventListener('visibilitychange', async () => {
+      if (wakeLock !== null && document.visibilityState === 'visible') {
+        requestWakeLock();
+      }
+    });
+
+    // ------------ RENDER / UI ------------
+    const container = $("#dialogueContainer");
+    const tpl = $("#dialogueTemplate");
+    const menuTpl = $("#menuTemplate");
+
+    function uniqueDramas() {
+      return [...new Set(dialogues.map(d => d.drama))];
+    }
+
+    function populateDramaFilter() {
+      const sel = $("#dramaFilter");
+      sel.innerHTML = `<option value="">🎭 All Dramas</option>`;
+      uniqueDramas().forEach(dr => {
+        const o = document.createElement("option");
+        o.value = dr; o.textContent = dr;
+        sel.appendChild(o);
+      });
+    }
+
+    let currentIndex = 0, isPlaying = false, playList = [];
+    let pendingUtterance = null;
+    let currentPromiseResolver = null;
+    let isPaused = false;
+    let isStopped = false;
+    let isRepeating = false;
+    let playbackQueue = [];
+
+    function matchFilters(d, idx) {
+      const q = $("#searchInput").value.trim().toLowerCase();
+      const drama = $("#dramaFilter").value;
+      const onlyFav = $("#showOnlyFav").checked;
+      let ok = true;
+      if (q) {
+        ok = d.zh.toLowerCase().includes(q) || d.hi.toLowerCase().includes(q) || d.drama.toLowerCase().includes(q);
+      }
+      if (ok && drama) { ok = d.drama === drama; }
+      if (ok && onlyFav) { ok = S.favorites.has(idx); }
+      return ok;
+    }
+
+    function render() {
+      container.innerHTML = "";
+      dialogues.forEach((d, i) => {
+        if (!matchFilters(d, i)) return;
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        node.dataset.index = i;
+        const dramaEl = node.querySelector('[data-role="drama"]');
+        dramaEl.textContent = d.drama;
+        if (d.hsk) dramaEl.textContent += ` • ${d.hsk}`;
+
+        node.querySelector('[data-role="index"]').textContent = i + 1;
+        const zhEl = node.querySelector('[data-role="zh"]');
+        zhEl.textContent = d.zh;
+        const hiEl = node.querySelector('[data-role="hi"]');
+        hiEl.textContent = d.hi;
+        hiEl.hidden = $("#hideHindi").checked;
+
+        const py = S.pinyin[i];
+        const pyBadge = node.querySelector('[data-role="pinyinBadge"]');
+        const pyEl = node.querySelector('[data-role="pinyin"]');
+        if (py && py.trim()) {
+          pyEl.textContent = py;
+          pyEl.hidden = false; pyBadge.hidden = false;
+        } else {
+          pyEl.hidden = true; pyBadge.hidden = true;
+        }
+
+        node.querySelector('[data-role="masterTag"]').hidden = !S.mastered.has(i);
+        const favBtn = node.querySelector('[data-role="favBtn"]');
+        if (S.favorites.has(i)) favBtn.classList.add("border-yellow-500", "bg-yellow-50", "dark:bg-yellow-900/20");
+
+        node.querySelector('[data-role="playCN"]').onclick = () => tapPlay(i, "cn");
+        node.querySelector('[data-role="playHI"]').onclick = () => tapPlay(i, "hi");
+        node.querySelector('[data-role="cnThenHi"]').onclick = () => playCNHI(i);
+        node.querySelector('[data-role="solo"]').onclick = () => soloPlay(i);
+        node.querySelector('[data-role="record"]').onclick = () => record(i);
+        node.querySelector('[data-role="replayRec"]').onclick = () => replayRecording(i);
+        node.querySelector('[data-role="markMaster"]').onclick = () => { toggleMaster(i, true); render(); };
+
+        node.querySelector('[data-role="speakPractice"]').onclick = () => speakPractice(i, node);
+
+        favBtn.onclick = () => { toggleFav(i); render(); };
+
+        const menuBtn = node.querySelector('[data-role="menuBtn"]');
+        menuBtn.onclick = (e) => openMenu(e.currentTarget, i);
+
+        zhEl.onclick = () => {
+          if ($("#autoRepeat").checked) {
+            const u = speak(d.zh, { lang: "zh-CN", voiceURI: S.cnVoice, rate: S.rate });
+            u.onend = () => zhEl.onclick();
+          } else {
+            tapPlay(i, "cn");
+          }
+        };
+
+        container.appendChild(node);
+      });
+
+      highlightActiveCard(playbackQueue[0]);
+      updateProgress();
+    }
+
+    function highlightActiveCard(index) {
+      $$(".active-dialogue").forEach(x => x.classList.remove("active-dialogue"));
+      const active = container.querySelector(`[data-index="${index}"]`);
+      if (active) active.classList.add("active-dialogue");
+    }
+
+    let openMenuNode = null;
+    function openMenu(btn, idx) {
+      closeMenu();
+      const menu = menuTpl.content.firstElementChild.cloneNode(true);
+      menu.style.right = "0";
+      btn.parentElement.style.position = "relative";
+      btn.parentElement.appendChild(menu);
+      openMenuNode = menu;
+
+      menu.querySelector('[data-action="editPinyin"]').onclick = () => {
+        selectLineForPinyin(idx);
+        closeMenu();
+      };
+      menu.querySelector('[data-action="copyCN"]').onclick = () => {
+        navigator.clipboard.writeText(dialogues[idx].zh);
+        closeMenu();
+      };
+      menu.querySelector('[data-action="copyHI"]').onclick = () => {
+        navigator.clipboard.writeText(dialogues[idx].hi);
+        closeMenu();
+      };
+      menu.querySelector('[data-action="speakSlow"]').onclick = () => {
+        speak(dialogues[idx].zh, { lang: "zh-CN", voiceURI: S.cnVoice, rate: 0.8 });
+      };
+      menu.querySelector('[data-action="removeMaster"]').onclick = () => {
+        toggleMaster(idx, false); render();
+      };
+      document.addEventListener("click", docClick, { once: true });
+      function docClick(ev) { if (!menu.contains(ev.target)) closeMenu(); }
+    }
+    function closeMenu() { if (openMenuNode) { openMenuNode.remove(); openMenuNode = null; } }
+
+    // ------------ ADVANCED PLAYBACK CONTROLS ------------
+    async function startPlayback() {
+      isStopped = false;
+      requestWakeLock();
+
+      while (playbackQueue.length > 0 && !isStopped) {
+        if (isPaused) {
+          await new Promise(resolve => {
+            currentPromiseResolver = resolve;
+          });
+          isPaused = false;
+        }
+
+        const idx = playbackQueue.shift();
+        const dialogue = dialogues[idx];
+        highlightActiveCard(idx);
+
+        try {
+          await speakAdvanced(dialogue.zh, { lang: "zh-CN", voiceURI: S.cnVoice, rate: S.rate });
+          await speakAdvanced(dialogue.hi, { lang: "hi-IN", voiceURI: S.hiVoice, rate: S.rate });
+          addProgress(idx);
+
+        } catch (e) {
+          console.error(`Error during playback of dialogue #${idx + 1}:`, e);
+        }
+      }
+
+      if (isRepeating && !isStopped) {
+          playbackQueue = buildList();
+          if (playbackQueue.length > 0) {
+              startPlayback();
+          }
+      } else {
+        isPlaying = false;
+        releaseWakeLock();
+      }
+    }
+
+    function speakAdvanced(text, options) {
+      return new Promise((resolve, reject) => {
+        const u = new SpeechSynthesisUtterance(text);
+        Object.assign(u, options);
+        u.onend = () => resolve();
+        u.onerror = (event) => reject(new Error(event.error));
+        pendingUtterance = u;
+        synth.speak(u);
+      });
+    }
+
+    function playAll() {
+      if (isPlaying) { stop(); }
+      isPlaying = true;
+      isPaused = false;
+      isStopped = false;
+      isRepeating = false;
+      playbackQueue = buildList();
+      if (playbackQueue.length === 0) { isPlaying = false; return; }
+      startPlayback();
+    }
+
+    function repeatAll() {
+      if (isPlaying) { stop(); }
+      isPlaying = true;
+      isPaused = false;
+      isStopped = false;
+      isRepeating = true;
+      playbackQueue = buildList();
+      if (playbackQueue.length === 0) { isPlaying = false; return; }
+      startPlayback();
+    }
+
+    function pause() {
+      if (isPlaying && !isPaused) {
+        isPaused = true;
+        synth.pause();
+      }
+    }
+
+    function resume() {
+      if (isPlaying && isPaused) {
+        isPaused = false;
+        synth.resume();
+        if (currentPromiseResolver) {
+          currentPromiseResolver();
+          currentPromiseResolver = null;
+        }
+      }
+    }
+
+    function stop() {
+      if (isPlaying) {
+        isStopped = true;
+        isPlaying = false;
+        isRepeating = false;
+        synth.cancel();
+        if (currentPromiseResolver) {
+          currentPromiseResolver();
+          currentPromiseResolver = null;
+        }
+        releaseWakeLock();
+      }
+    }
+
+    function nextDialogue() {
+      if (isPlaying) {
+        stop();
+        const currentIdx = playbackQueue.length > 0 ? playbackQueue[0] : -1;
+        const nextIdx = dialogues.findIndex((d, i) => i > currentIdx && matchFilters(d, i));
+        if (nextIdx !== -1) {
+          playbackQueue = [nextIdx, ...buildList().filter(i => i > nextIdx)];
+          startPlayback();
+        }
+      }
+    }
+
+    function prevDialogue() {
+      if (isPlaying) {
+        stop();
+        const currentIdx = playbackQueue.length > 0 ? playbackQueue[0] : -1;
+        const prevIdx = dialogues.slice(0, currentIdx).reverse().findIndex((d, i) => matchFilters(d, currentIdx - 1 - i));
+        if (prevIdx !== -1) {
+          const actualPrevIdx = currentIdx - 1 - prevIdx;
+          playbackQueue = [actualPrevIdx, ...buildList().filter(i => i > actualPrevIdx)];
+          startPlayback();
+        }
+      }
+    }
+
+    function buildList() {
+      return dialogues.map((_, i) => i).filter(i => matchFilters(dialogues[i], i));
+    }
+
+    function soloPlay(i) {
+      stop();
+      requestWakeLock();
+      const u = speak(dialogues[i].zh, { lang: "zh-CN", voiceURI: S.cnVoice, rate: S.rate });
+      u.onend = () => releaseWakeLock();
+    }
+
+    function playCNHI(i) {
+      stop();
+      requestWakeLock();
+      const u1 = speak(dialogues[i].zh, { lang: "zh-CN", voiceURI: S.cnVoice, rate: S.rate });
+      u1.onend = () => {
+        const u2 = speak(dialogues[i].hi, { lang: "hi-IN", voiceURI: S.hiVoice, rate: S.rate });
+        u2.onend = () => releaseWakeLock();
+      };
+    }
+
+    function tapPlay(i, type) {
+      requestWakeLock();
+      if (type === "cn") {
+        const u = speak(dialogues[i].zh, { lang: "zh-CN", voiceURI: S.cnVoice, rate: S.rate });
+        u.onend = () => releaseWakeLock();
+      }
+      else {
+        const u = speak(dialogues[i].hi, { lang: "hi-IN", voiceURI: S.hiVoice, rate: S.rate });
+        u.onend = () => releaseWakeLock();
+      }
+    }
+
+    // ------------ RECORDING ------------
+    let mediaRecorder, audioChunks = {}, recordings = {};
+    async function record(i) {
+      try {
+        if (mediaRecorder && mediaRecorder.state === "recording") { mediaRecorder.stop(); return; }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream); audioChunks[i] = [];
+        mediaRecorder.ondataavailable = e => audioChunks[i].push(e.data);
+        mediaRecorder.onstop = () => {
+          recordings[i] = URL.createObjectURL(new Blob(audioChunks[i]));
+        };
+        mediaRecorder.start();
+        setTimeout(() => { if (mediaRecorder.state === "recording") mediaRecorder.stop(); }, 5000);
+      } catch (e) {
+        alert("Microphone अनुमति चाहिए।");
+      }
+    }
+    function replayRecording(i) {
+      if (recordings[i]) new Audio(recordings[i]).play();
+      else alert("पहले रिकॉर्ड करें।");
+    }
+
+    // ------------ SPEECH RECOGNITION (NEW FEATURE) ------------
+    let recognition;
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = 'zh-CN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+    } else {
+      console.warn("Speech Recognition not supported in this browser.");
+    }
+
+    function speakPractice(i, node) {
+      if (!recognition) {
+        alert("Sorry, your browser does not support speech recognition. Please try Chrome.");
+        return;
+      }
+      const statusEl = node.querySelector('[data-role="speechStatus"]');
+      const zhEl = node.querySelector('[data-role="zh"]');
+      const originalText = dialogues[i].zh;
+      zhEl.innerHTML = originalText;
+      statusEl.textContent = '🎧 बोलिए...';
+      recognition.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        compareSpeech(originalText, result, zhEl, statusEl);
+      };
+      recognition.onerror = (event) => {
+        statusEl.textContent = `❌ कुछ गलत हुआ: ${event.error}`;
+      };
+      recognition.onend = () => {
+        if (statusEl.textContent === '🎧 बोलिए...') {
+          statusEl.textContent = '⏱️ कोई आवाज़ नहीं मिली। फिर से कोशिश करें।';
+        }
+      };
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error(e);
+        statusEl.textContent = '❌ आवाज़ रिकॉर्ड नहीं कर सकते। शायद माइक्रोफ़ोन पहले से उपयोग में है।';
+      }
+    }
+
+    function compareSpeech(original, recognized, zhEl, statusEl) {
+      const originalClean = original.replace(/[\s\p{P}]/gu, '');
+      const recognizedClean = recognized.replace(/[\s\p{P}]/gu, '');
+      if (originalClean === recognizedClean) {
+        statusEl.textContent = '✅ बिलकुल सही! बहुत बढ़िया!';
+        addProgress(dialogues.findIndex(d => d.zh === original));
+        return;
+      }
+      let highlightedText = '';
+      let originalChars = original.split('');
+      let recognizedChars = recognized.split('');
+      let originalPunctuation = {};
+      originalChars = originalChars.filter((char, index) => {
+        if (/[，。！？]/.test(char)) {
+          originalPunctuation[index] = char;
+          return false;
+        }
+        return true;
+      });
+      for (let j = 0; j < originalChars.length; j++) {
+        const originalChar = originalChars[j];
+        const recognizedChar = recognizedChars[j];
+        if (originalChar === recognizedChar) {
+          highlightedText += `<span class="pinyin-highlight">${originalChar}</span>`;
+        } else {
+          highlightedText += `<span class="pinyin-mismatch">${originalChar}</span>`;
+        }
+      }
+      for (const index in originalPunctuation) {
+        highlightedText = highlightedText.slice(0, index) + originalPunctuation[index] + highlightedText.slice(index);
+      }
+      zhEl.innerHTML = highlightedText;
+      statusEl.textContent = '⚠️ थोड़ा अलग है। लाल रंग के अक्षरों पर ध्यान दें।';
+    }
+
+    // ------------ VOCABULARY BUILDER & BOOKMARK ------------
+    const vocabContainer = $("#vocabContainer");
+    const vocabTpl = $("#vocabCardTemplate");
+    function renderVocabulary() {
+      const query = $("#vocabSearch").value.trim().toLowerCase();
+      vocabContainer.innerHTML = "";
+      vocabData.forEach((word, i) => {
+        if (query && !word.zh.toLowerCase().includes(query) && !word.pinyin.toLowerCase().includes(query) && !word.hi.toLowerCase().includes(query)) {
+          return;
+        }
+        const card = vocabTpl.content.firstElementChild.cloneNode(true);
+        const bookmarkBtn = card.querySelector('[data-role="bookmarkBtn"]');
+        if (S.bookmarkedVocab.has(i)) {
+          bookmarkBtn.classList.add("text-yellow-500", "hover:text-yellow-600");
+        }
+        bookmarkBtn.onclick = () => {
+          if (S.bookmarkedVocab.has(i)) {
+            S.bookmarkedVocab.delete(i);
+          } else {
+            S.bookmarkedVocab.add(i);
+          }
+          saveState();
+          renderVocabulary();
+        };
+        card.querySelector('[data-role="zh"]').textContent = word.zh;
+        card.querySelector('[data-role="pinyin"]').textContent = word.pinyin;
+        card.querySelector('[data-role="hi"]').textContent = word.hi;
+        const hskEl = card.querySelector('[data-role="hsk"]');
+        if (word.hsk) {
+          hskEl.textContent = word.hsk;
+          hskEl.hidden = false;
+        }
+        vocabContainer.appendChild(card);
+      });
+    }
+
+    // ------------ FAVORITES / MASTERED / PROGRESS ------------
+    function toggleFav(i) { if (S.favorites.has(i)) S.favorites.delete(i); else S.favorites.add(i); saveState(); }
+    function toggleMaster(i, val) { val ? S.mastered.add(i) : S.mastered.delete(i); saveState(); }
+    function addProgress(i) { S.mastered.add(i); saveState(); }
+    function updateProgress() {
+      const total = dialogues.length, done = S.mastered.size;
+      $("#progressText").textContent = `Progress: ${done} / ${total} mastered`;
+      $("#progressBar").style.width = (total > 0 ? (done / total * 100) : 0) + "%";
+    }
+
+    // ------------ QUIZ ------------
+    function newQuiz() {
+      const pool = buildList();
+      if (pool.length < 4) { $("#quizBox").innerHTML = `<p class="muted">क्विज़ के लिए कम से कम 4 लाइनें चाहिए।</p>`; return; }
+      const idx = pool[Math.floor(Math.random() * pool.length)];
+      const correct = dialogues[idx];
+      const opts = new Set([idx]);
+      while (opts.size < 4) { opts.add(pool[Math.floor(Math.random() * pool.length)]); }
+      const choices = [...opts].sort(() => Math.random() - 0.5);
+      const box = $("#quizBox");
+      box.innerHTML = "";
+      const q = document.createElement("div");
+      q.className = "p-3 rounded-2xl border card";
+      q.innerHTML = `
+        <div class="text-lg mb-2">${correct.zh}</div>
+        <div class="grid gap-2">
+          ${choices.map((j, k) => `<button data-j="${j}" class="btn border-gray-300 dark:border-gray-700 text-left">${String.fromCharCode(65 + k)}. ${dialogues[j].hi}</button>`).join("")}
+        </div>
+      `;
+      box.appendChild(q);
+      q.querySelectorAll("button").forEach(b => {
+        b.onclick = () => {
+          const j = +b.dataset.j;
+          if (j === idx) { b.classList.add("border-emerald-400"); addProgress(idx); }
+          else { b.classList.add("border-red-400"); }
+          setTimeout(newQuiz, 600);
+        };
+      });
+    }
+
+    // ------------ FLASHCARDS ------------
+    let flashQueue = [];
+    function startFlash(list) {
+      flashQueue = list.slice().sort(() => Math.random() - 0.5);
+      nextFlash();
+    }
+    function nextFlash() {
+      const box = $("#flashBox"); box.innerHTML = "";
+      if (!flashQueue.length) { box.innerHTML = `<div class="muted">🎉 Review complete!</div>`; return; }
+      const i = flashQueue.shift();
+      const d = dialogues[i];
+      const card = document.createElement("div");
+      card.className = "p-4 rounded-2xl border card";
+      card.innerHTML = `
+        <div class="text-sm mb-2">🎭 ${d.drama} • #${i + 1}</div>
+        <div class="text-xl mb-2">${d.zh}</div>
+        <button class="btn border-gray-300 dark:border-gray-700" id="revealBtn">👁️ Show Hindi</button>
+        <div id="ans" class="mt-3 hidden">
+          <div class="text-base">${d.hi}</div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn border-emerald-300" id="easyBtn">👍 Easy</button>
+            <button class="btn border-yellow-300" id="okBtn">➖ Okay</button>
+            <button class="btn border-red-300" id="hardBtn">👎 Hard</button>
+          </div>
+        </div>
+      `;
+      box.appendChild(card);
+      $("#revealBtn", card).onclick = () => $("#ans", card).classList.remove("hidden");
+      $("#easyBtn", card).onclick = () => setTimeout(nextFlash, 150);
+      $("#okBtn", card).onclick = () => setTimeout(() => { flashQueue.splice(Math.floor(flashQueue.length / 2), 0, i); nextFlash(); }, 150);
+      $("#hardBtn", card).onclick = () => setTimeout(() => { flashQueue.push(i); nextFlash(); }, 150);
+    }
+
+    // ------------ DIALOGUE INPUT ------------
+    $("#saveDialogueBtn").onclick = () => {
+      const zh = $("#inputZh").value.trim();
+      const hi = $("#inputHi").value.trim();
+      const pinyin = $("#inputPinyin").value.trim();
+      const drama = $("#inputDrama").value.trim() || "User Added";
+      if (!zh || !hi) {
+        alert("Mandarin और Hindi अनुवाद अनिवार्य है।");
+        return;
+      }
+      const newDialogue = { drama, zh, hi, pinyin: pinyin || null };
+      const userDialogues = JSON.parse(localStorage.getItem('userDialogues') || '[]');
+      userDialogues.push(newDialogue);
+      localStorage.setItem('userDialogues', JSON.stringify(userDialogues));
+      dialogues.push(newDialogue); // Add to current session's data
+      alert("डायलॉग सफलतापूर्वक जोड़ा गया!");
+      $("#inputZh").value = "";
+      $("#inputHi").value = "";
+      $("#inputPinyin").value = "";
+      $("#inputDrama").value = "";
+      render();
+    };
+
+    // New paste functionality
+    $("#zhPasteBtn").onclick = async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        const cleanedText = text.trim();
+        $("#inputZh").value = cleanedText;
+        if (typeof pinyin === 'function') {
+          const pinyinResult = pinyin(cleanedText, {
+            segment: true,
+            style: pinyin.STYLE_TONE
+          }).flat().join(' ');
+          $("#inputPinyin").value = pinyinResult;
+        }
+      } catch (err) {
+        alert('क्लिपबोर्ड से टेक्स्ट पढ़ने में विफल। कृपया मैन्युअल रूप से पेस्ट करें।');
+      }
+    };
+
+    $("#zhClearBtn").onclick = () => {
+      $("#inputZh").value = '';
+    };
+
+    $("#hiPasteBtn").onclick = async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        const cleanedText = text.trim();
+        $("#inputHi").value = cleanedText;
+      } catch (err) {
+        alert('क्लिपबोर्ड से टेक्स्ट पढ़ने में विफल। कृपया मैन्युअल रूप से पेस्ट करें।');
+      }
+    };
+
+    $("#hiClearBtn").onclick = () => {
+      $("#inputHi").value = '';
+    };
+
+    // ------------ PINYIN EDITOR ------------
+    let pinyinTargetIndex = null;
+    function selectLineForPinyin(i) {
+      pinyinTargetIndex = i;
+      $("#pinyinHint").textContent = `Editing Pinyin for #${i + 1} — "${dialogues[i].zh.slice(0, 15)}..."`;
+      $("#pinyinEditor").value = S.pinyin[i] ?? "";
+      switchTab("settings");
+    }
+    $("#savePinyin").onclick = () => {
+      if (pinyinTargetIndex == null) return;
+      S.pinyin[pinyinTargetIndex] = $("#pinyinEditor").value.trim();
+      saveState(); render();
+    };
+    $("#clearPinyin").onclick = () => {
+      if (pinyinTargetIndex == null) return;
+      delete S.pinyin[pinyinTargetIndex];
+      $("#pinyinEditor").value = "";
+      saveState(); render();
+    };
+
+    // ------------ EXPORT / IMPORT ------------
+    $("#exportBtn").onclick = () => {
+      const state = JSON.parse(localStorage.getItem(LSKEY) || "{}");
+      const userDialogues = JSON.parse(localStorage.getItem('userDialogues') || "[]");
+      const dataToExport = {
+        state,
+        userDialogues
+      };
+      const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "mandarin-guru-backup.json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+    };
+
+    $("#importInput").onchange = (e) => {
+      const f = e.target.files?.[0]; if (!f) return;
+      const fr = new FileReader();
+      fr.onload = () => {
+        try {
+          const importedData = JSON.parse(fr.result);
+          if (importedData.state) {
+            localStorage.setItem(LSKEY, JSON.stringify(importedData.state));
+            loadState();
+          }
+          if (importedData.userDialogues) {
+            localStorage.setItem('userDialogues', JSON.stringify(importedData.userDialogues));
+          }
+          fetchData(); // Reload all data and state
+          alert("Import done.");
+        } catch (err) {
+          alert("Invalid file.");
+        }
+      };
+      fr.readAsText(f);
+    };
+
+    // ------------ THEME ------------
+    $("#themeBtn").onclick = () => {
+      document.documentElement.classList.toggle("dark");
+      S.dark = document.documentElement.classList.contains("dark");
+      saveState();
+    };
+
+    // ------------ EVENTS ------------
+    $("#playAllBtn").onclick = playAll;
+    $("#repeatAllBtn").onclick = repeatAll;
+    $("#pauseBtn").onclick = pause;
+    $("#resumeBtn").onclick = resume;
+    $("#stopBtn").onclick = stop;
+    $("#prevBtn").onclick = prevDialogue;
+    $("#nextBtn").onclick = nextDialogue;
+    $("#rateSelect").onchange = e => { S.rate = parseFloat(e.target.value); saveState(); };
+    $("#cnVoice").onchange = e => { S.cnVoice = e.target.value; saveState(); };
+    $("#hiVoice").onchange = e => { S.hiVoice = e.target.value; saveState(); };
+    $("#searchInput").oninput = render;
+    $("#dramaFilter").onchange = render;
+    $("#hideHindi").onchange = render;
+    $("#showOnlyFav").onchange = render;
+    $("#vocabSearch").oninput = renderVocabulary;
+    $("#newQuizBtn").onclick = newQuiz;
+    $("#reviewFavs").onclick = () => { const list = [...S.favorites]; if (!list.length) return alert("कोई Favorite नहीं।"); startFlash(list); };
+    $("#reviewAll").onclick = () => startFlash(dialogues.map((_, i) => i));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") { e.preventDefault(); isPlaying ? (isPaused ? resume() : pause()) : playAll(); }
+      if (e.key === "s" || e.key === "S") { stop(); }
+      if (e.key === "n" || e.key === "N") { nextDialogue(); }
+      if (e.key === "p" || e.key === "P") { prevDialogue(); }
+    });
+
+    // ------------ INIT ------------
+    loadState();
+    fetchData();
+    refreshVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = refreshVoices;
+    }
+
+    function switchTab(tabName) {
+      $$("section[id^='tab-']").forEach(section => section.classList.add("hidden"));
+      $(`#tab-${tabName}`).classList.remove("hidden");
+      $$(".tab").forEach(btn => {
+        btn.classList.remove("bg-white", "dark:bg-gray-800");
+        if (btn.dataset.tab === tabName) {
+          btn.classList.add("bg-white", "dark:bg-gray-800");
+        }
+      });
+    }
+
+    $$(".tab").forEach(btn => {
+      btn.onclick = () => {
+        switchTab(btn.dataset.tab);
+        if (btn.dataset.tab === 'vocab') {
+          renderVocabulary();
+        }
+      };
+    });
+    switchTab("learn");
+  </script>
+</body>
+</html>
