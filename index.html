@@ -178,6 +178,125 @@
                  data-video-title="When I Fly Towards You Episode 1| Chinese Drama Hindi Dubbed | Korean Drama Hindi Dubbed"
                  data-id="4">
                 
+                <img src="IMG_20250929_154124.jpg" alt="When I Fly Towards You">
+                <p>Episode 1 (YouTube)</p>
+            </div>
+            
+            <div class="video-thumbnail" 
+                 data-video-src="https://www.youtube.com/embed/kza4z-3fjOA" 
+                 data-video-title="Video Title 2: Best Moments" data-id="2">
+                <img src="IMG_20250929_154124.jpg" alt="Thumbnail 2">
+                <p>Video 2: Best Moments (Placeholder)</p>
+            </div>
+            
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Kanchi Roll Videos. All Rights Reserved. | Designed with HTML, CSS & JavaScript</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainVideoPlayerIframe = document.getElementById('main-video-player-iframe');
+            const videoTitle = document.getElementById('video-title');
+            const videoThumbnails = document.querySelectorAll('.video-thumbnail');
+
+            function setActiveThumbnail(currentThumbnail) {
+                videoThumbnails.forEach(t => t.classList.remove('active'));
+                currentThumbnail.classList.add('active');
+            }
+
+            videoThumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', () => {
+                    const videoSrc = thumbnail.getAttribute('data-video-src');
+                    const newTitle = thumbnail.getAttribute('data-video-title');
+
+                    // IFRAME का src बदलें
+                    mainVideoPlayerIframe.src = videoSrc;
+                    videoTitle.textContent = newTitle;
+
+                    setActiveThumbnail(thumbnail);
+
+                    // YouTube Embed खुद ही वीडियो लोड और प्ले करता है
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+        }
+
+        .video-thumbnail:hover {
+            background-color: #2a2a2a;
+            transform: scale(1.02);
+        }
+        
+        /* Active Video State */
+        .video-thumbnail.active {
+            background-color: #007bff;
+            border: 1px solid #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+        .video-thumbnail.active p {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .video-thumbnail img {
+            min-width: 120px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 1rem;
+            border: 2px solid #444;
+        }
+
+        .video-thumbnail p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #cccccc;
+        }
+
+        /* Footer Styling (unchanged) */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            background-color: #1a1a1a;
+            border-top: 1px solid #333;
+            font-size: 0.8rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Asian Drama Hub: Kanchi Roll Video Stream</h1>
+    </header>
+
+    <main>
+        <div class="video-player-container">
+            <div class="video-wrapper">
+                <iframe id="main-video-player-iframe" 
+                        src="https://www.youtube.com/embed/kza4z-3fjOA" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+            
+            <h2 id="video-title">When I Fly Towards You Episode 1| Chinese Drama Hindi Dubbed | Korean Drama Hindi Dubbed</h2>
+        </div>
+
+        <div class="video-playlist">
+            <h3>Playlist / Episode List</h3>
+            
+            <div class="video-thumbnail active" 
+                 data-video-src="https://www.youtube.com/embed/kza4z-3fjOA" 
+                 data-video-title="When I Fly Towards You Episode 1| Chinese Drama Hindi Dubbed | Korean Drama Hindi Dubbed"
+                 data-id="4">
+                
                 <img src="images/IMG_20250929_154124.jpg" alt="When I Fly Towards You">
                 <p>Episode 1 (YouTube)</p>
             </div>
