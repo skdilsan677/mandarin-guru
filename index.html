@@ -3,344 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asian Drama Hub: Video Stream</title>
-    
+    <title>My AI Dubbing Player</title>
     <style>
-        /* Basic Styling */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #0d0d0d;
+            background-color: #121212;
             color: #ffffff;
-            line-height: 1.6;
-        }
-
-        header {
-            background-color: #1a1a1a;
-            padding: 1.5rem 1rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            border-bottom: 3px solid #007bff;
-        }
-
-        header h1 {
             margin: 0;
-            font-size: 2.2rem;
-            color: #e0e0e0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
-
-        /* Main Layout */
-        main {
-            padding: 1rem;
-            max-width: 1400px;
-            margin: 1rem auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
+        h1 {
+            color: #4CAF50;
         }
-        
-        @media (min-width: 900px) {
-            main {
-                grid-template-columns: 2fr 1fr; 
-            }
-        }
-
-        /* Video Player Styling */
-        .video-player-container {
-            background-color: #1a1a1a;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            overflow: hidden; 
-        }
-
-        /* Video/Iframe Container - Ensure proper aspect ratio */
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
-        }
-
-        #main-video-player-iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        #video-title {
-            margin-top: 1rem;
-            font-size: 1.8rem;
-            color: #007bff;
-            border-bottom: 1px solid #333;
-            padding-bottom: 0.5rem;
-        }
-
-        /* Playlist Styling (unchanged) */
-        .video-playlist {
-            background-color: #1a1a1a;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .video-playlist h3 {
-            text-align: center;
-            color: #f0f0f0;
-            margin-top: 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #333;
-        }
-
-        .video-thumbnail {
+        .player-container {
+            background-color: #1e1e1e;
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: center;
+            border: 2px solid #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .controls button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background-color 0.2s, transform 0.2s;
-            border: 1px solid transparent;
+            transition: background 0.3s;
         }
-
-        .video-thumbnail:hover {
-            background-color: #2a2a2a;
-            transform: scale(1.02);
+        .controls button:hover {
+            background-color: #3700b3;
         }
-        
-        /* Active Video State */
-        .video-thumbnail.active {
-            background-color: #007bff;
-            border: 1px solid #007bff;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-        }
-        .video-thumbnail.active p {
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        .video-thumbnail img {
-            min-width: 120px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-right: 1rem;
-            border: 2px solid #444;
-        }
-
-        .video-thumbnail p {
-            margin: 0;
-            font-size: 0.95rem;
-            color: #cccccc;
-        }
-
-        /* Footer Styling (unchanged) */
-        footer {
-            text-align: center;
-            padding: 1rem;
-            margin-top: 2rem;
-            background-color: #1a1a1a;
-            border-top: 1px solid #333;
-            font-size: 0.8rem;
-            color: #888;
+        #status-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #bb86fc;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Asian Drama Hub: Kanchi Roll Video Stream</h1>
-    </header>
+    <h1>🚀 My First Web App (Testing)</h1>
+    <p>Live Dubbing Player Interface</p>
 
-    <main>
-        <div class="video-player-container">
-            <div class="video-wrapper">
-                <iframe id="main-video-player-iframe" 
-                        src="https://www.youtube.com/embed/kza4z-3fjOA" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen>
-                </iframe>
-            </div>
-            
-            <h2 id="video-title">When I Fly Towards You Episode 1| Chinese Drama Hindi Dubbed | Korean Drama Hindi Dubbed</h2>
-        </div>
+    <div class="player-container">
+        <h2>🎬 Video Screen (C-Drama)</h2>
+    </div>
 
-        <div class="video-playlist">
-            <h3>Playlist / Episode List</h3>
-            
-            <div class="video-thumbnail active" 
-                 data-video-src="https://www.youtube.com/embed/kza4z-3fjOA" 
-                 data-video-title="When I Fly Towards You Episode 1| Chinese Drama Hindi Dubbed | Korean Drama Hindi Dubbed"
-                 data-id="4">
-                
-                <img src="IMG_20250929_154124.jpg" alt="When I Fly Towards You">
-                <p>Episode 1 (YouTube)</p>
-            </div>
-            
-            <div class="video-thumbnail" 
-                 data-video-src="https://www.youtube.com/embed/kza4z-3fjOA" 
-                 data-video-title="Video Title 2: Best Moments" data-id="2">
-                <img src="IMG_20250929_154124.jpg" alt="Thumbnail 2">
-                <p>Video 2: Best Moments (Placeholder)</p>
-            </div>
-            
-        </div>
-    </main>
+    <div class="controls">
+        <button onclick="playVideo()">▶ Play Video</button>
+        <button onclick="startDubbing()">🎙 Start Hindi Dubbing</button>
+    </div>
 
-    <footer>
-        <p>&copy; 2025 Kanchi Roll Videos. All Rights Reserved. | Designed with HTML, CSS & JavaScript</p>
-    </footer>
+    <p id="status-text">System Status: Ready to start...</p>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mainVideoPlayerIframe = document.getElementById('main-video-player-iframe');
-            const videoTitle = document.getElementById('video-title');
-            const videoThumbnails = document.querySelectorAll('.video-thumbnail');
+        function playVideo() {
+            document.getElementById('status-text').innerText = "Status: Video is playing...";
+            document.querySelector('.player-container h2').innerText = "Playing: The Untamed (Ep 1)";
+        }
 
-            function setActiveThumbnail(currentThumbnail) {
-                videoThumbnails.forEach(t => t.classList.remove('active'));
-                currentThumbnail.classList.add('active');
-            }
-
-            videoThumbnails.forEach(thumbnail => {
-                thumbnail.addEventListener('click', () => {
-                    const videoSrc = thumbnail.getAttribute('data-video-src');
-                    const newTitle = thumbnail.getAttribute('data-video-title');
-
-                    // IFRAME का src बदलें
-                    mainVideoPlayerIframe.src = videoSrc;
-                    videoTitle.textContent = newTitle;
-
-                    setActiveThumbnail(thumbnail);
-
-                    // YouTube Embed खुद ही वीडियो लोड और प्ले करता है
-                });
-            });
-        });
+        function startDubbing() {
+            document.getElementById('status-text').innerText = "Status: 🟢 AI Engine Active - Translating to Hindi...";
+            alert("Badhai ho! Aapki Website perfectly kaam kar rahi hai!");
+        }
     </script>
-</body>
-</html>
-        }
 
-        .video-thumbnail:hover {
-            background-color: #2a2a2a;
-            transform: scale(1.02);
-        }
-        
-        /* Active Video State */
-        .video-thumbnail.active {
-            background-color: #007bff;
-            border: 1px solid #007bff;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-        }
-        .video-thumbnail.active p {
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        .video-thumbnail img {
-            min-width: 120px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-right: 1rem;
-            border: 2px solid #444;
-        }
-
-        .video-thumbnail p {
-            margin: 0;
-            font-size: 0.95rem;
-            color: #cccccc;
-        }
-
-        /* Footer Styling (unchanged) */
-        footer {
-            text-align: center;
-            padding: 1rem;
-            margin-top: 2rem;
-            background-color: #1a1a1a;
-            border-top: 1px solid #333;
-            font-size: 0.8rem;
-            color: #888;
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>Asian Drama Hub: Kanchi Roll Video Stream</h1>
-    </header>
-
-    <main>
-        <div class="video-player-container">
-            <div class="video-wrapper">
-                <iframe id="main-video-player-iframe" 
-                        src="https://www.youtube.com/embed/kza4z-3fjOA" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen>
-                </iframe>
-            </div>
-            
-            <h2 id="video-title">When I Fly Towards You Episode 1| Chinese Drama Hindi Dubbed | Korean Drama Hindi Dubbed</h2>
-        </div>
-
-        <div class="video-playlist">
-            <h3>Playlist / Episode List</h3>
-            
-            <div class="video-thumbnail active" 
-                 data-video-src="https://www.youtube.com/embed/kza4z-3fjOA" 
-                 data-video-title="When I Fly Towards You Episode 1| Chinese Drama Hindi Dubbed | Korean Drama Hindi Dubbed"
-                 data-id="4">
-                
-                <img src="images/IMG_20250929_154124.jpg" alt="When I Fly Towards You">
-                <p>Episode 1 (YouTube)</p>
-            </div>
-            
-            <div class="video-thumbnail" 
-                 data-video-src="https://www.youtube.com/embed/kza4z-3fjOA" 
-                 data-video-title="Video Title 2: Best Moments" data-id="2">
-                <img src="images/IMG_20250929_154124.jpg" alt="Thumbnail 2">
-                <p>Video 2: Best Moments (Placeholder)</p>
-            </div>
-            
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Kanchi Roll Videos. All Rights Reserved. | Designed with HTML, CSS & JavaScript</p>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mainVideoPlayerIframe = document.getElementById('main-video-player-iframe');
-            const videoTitle = document.getElementById('video-title');
-            const videoThumbnails = document.querySelectorAll('.video-thumbnail');
-
-            function setActiveThumbnail(currentThumbnail) {
-                videoThumbnails.forEach(t => t.classList.remove('active'));
-                currentThumbnail.classList.add('active');
-            }
-
-            videoThumbnails.forEach(thumbnail => {
-                thumbnail.addEventListener('click', () => {
-                    const videoSrc = thumbnail.getAttribute('data-video-src');
-                    const newTitle = thumbnail.getAttribute('data-video-title');
-
-                    // IFRAME का src बदलें
-                    mainVideoPlayerIframe.src = videoSrc;
-                    videoTitle.textContent = newTitle;
-
-                    setActiveThumbnail(thumbnail);
-
-                    // YouTube Embed खुद ही वीडियो लोड और प्ले करता है
-                });
-            });
-        });
-    </script>
 </body>
 </html>
